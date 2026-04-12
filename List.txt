@@ -1,0 +1,17 @@
+1. Write a program to scan and count the number of characters, words, and lines in a file/input.(switch case)
+
+2. Write a program to identify whether a given line is a comment or not.
+
+3. Write a program to test whether a given identifier is valid or not.
+
+4. Write a program to recognize strings under the patterns a, a*b+, and abb.
+
+5. Write a program to simulate a lexical analyzer for validating operators.
+
+6. Write a program to count the number of operators in a given string.
+
+7. Write a program to implement NFA that recognizes identifiers.
+
+8. Write a program to implement DFA that recognizes identifiers, constants, and operators.
+
+9. Write a program to design a lexical analyzer that ignores spaces, tabs, new lines, and comments.
