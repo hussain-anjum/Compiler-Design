@@ -7,6 +7,7 @@ int main()
 
     string line;
     int lineNum = 0;
+    bool inMultiLine = false;
 
     cout << endl;
     while (getline(file, line))
@@ -20,17 +21,34 @@ int main()
         }
         string trimString = line.substr(start);
 
-        // cout << "Line " << lineNum << ": " << line << endl;
-
-        // single line
-        if (trimString.length() >= 2 && trimString[0] == '/' && trimString[1] == '/')
+        if (inMultiLine)
+        {
+            cout << "Multi Line Comment" << endl;
+            if (trimString.find("*/") != string::npos)
+            {
+                inMultiLine = false; // if finds */ multi line is complete
+            }
+        }
+        // single line comment
+        else if (trimString.length() >= 2 && trimString[0] == '/' && trimString[1] == '/')
         {
             cout << "Single Line Comment" << endl;
         }
+
         // multi line
-        else if (trimString.length() >= 4 && trimString[0] == '/' && trimString[1] == '*' && trimString[trimString.length() - 2] == '*' && trimString[trimString.length() - 1] == '/')
+        else if (trimString.length() >= 2 && trimString[0] == '/' && trimString[1] == '*')
         {
             cout << "Multi Line Comment" << endl;
+            if (trimString.find("*/") == string::npos)
+            {
+                inMultiLine = true; // if not find */, flag on
+            }
+        }
+
+        // inline comment
+        else if (trimString.find("//") != string::npos)
+        {
+            cout << "Inline Comment" << endl;
         }
         else
         {

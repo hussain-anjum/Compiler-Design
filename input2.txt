@@ -1,4 +1,6 @@
 // single line comment
-int x = 5;
-/* multi line comment */
+int x = 5;// ojinh
+/* multi line comment 
+this is also a comment
+*/
 cout << "code success" <<endl;
