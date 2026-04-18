@@ -13,7 +13,7 @@ int main()
     while (getline(file, line))
     {
         if (line.empty())
-            continue; // skip empty line
+            continue;
 
         lineCount++;
         charCount += line.length();

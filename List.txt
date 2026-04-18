@@ -1,4 +1,4 @@
-1. Write a program to scan and count the number of characters, words, and lines in a file/input. ✅
+1. Write a program to scan and count the number of characters, words, and lines in a file. ✅
 
 2. Write a program to identify whether a given line is a comment or not. ✅
 
