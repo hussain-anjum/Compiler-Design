@@ -1,5 +1,6 @@
 1_count_char_word_line.exe
 2_identify_comment.exe
 test.cpp
+test.exe
 3_valid_identifier.exe
 7_count_operator.exe
