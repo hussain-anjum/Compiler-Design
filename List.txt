@@ -6,15 +6,22 @@
 
 4. Write a program to test whether a given identifier is valid or not. ✅
 
+5. Write a program to recognize strings under the patterns a, a*b+, and abb.✅
+
 6. Write a program to simulate a lexical analyzer for validating operators.✅
 
 7. Write a program to count the number of operators in a given string. ✅
 
-
-5. Write a program to recognize strings under the patterns a, a*b+, and abb.✅
-
 8. Write a program to implement NFA that recognizes identifiers.✅
 
-9. Write a program to implement DFA that recognizes identifiers, constants, and operators.
+9. Write a program to implement DFA that recognizes identifiers, constants, and operators.✅
 
-. Write a program to design a lexical analyzer that ignores spaces, tabs, new lines, and comments.
+10. Write a program to design a lexical analyzer that ignores spaces, tabs, new lines, and comments.✅(shudhu lexeam gula dekhabe output e)
+
+11. Write a program to perform left factoring for a given grammar.✅
+
+12. Write a program to find FIRST values from a given set of production.
+
+13. Write a program to find FOLLOW values from a given set of production.
+
+14. Write a program to eliminating left recursion for a given grammar.

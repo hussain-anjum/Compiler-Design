@@ -1,0 +1,10 @@
+// this is a single line comment
+int x = 10;
+/* this is
+   a multi line
+   comment */
+if (x == 10)
+{
+    y += x;
+}
+return 0;
