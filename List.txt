@@ -16,12 +16,12 @@
 
 9. Write a program to implement DFA that recognizes identifiers, constants, and operators.✅
 
-10. Write a program to design a lexical analyzer that ignores spaces, tabs, new lines, and comments.✅(shudhu lexeam gula dekhabe output e)
+10. Write a program to design a lexical analyzer that ignores spaces, tabs, new lines, and comments.✅
 
 11. Write a program to perform left factoring for a given grammar.✅
 
-12. Write a program to find FIRST values from a given set of production.
+12. Write a program to find FIRST values from a given set of production.✅
 
-13. Write a program to find FOLLOW values from a given set of production.
+13. Write a program to find FOLLOW values from a given set of production.✅
 
-14. Write a program to eliminating left recursion for a given grammar.
+14. Write a program to eliminating left recursion for a given grammar.✅
