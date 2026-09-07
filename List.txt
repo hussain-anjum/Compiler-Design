@@ -1,4 +1,4 @@
-1. Explain the importantance and rationale behind the Compiler Design Laboratory. ✅
+1. Explain the importance and rationale behind the Compiler Design Laboratory. ✅
 
 2. Write a program to scan and count the number of characters, words, and lines in a file. ✅
 
