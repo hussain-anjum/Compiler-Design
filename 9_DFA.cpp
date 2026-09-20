@@ -7,6 +7,8 @@ enum State
     q1,
     q2,
     q3,
+    q4,
+    q5,
     dead
 };
 
@@ -49,10 +51,20 @@ State transition(State current, char ch)
         if (isdigit(ch))
             return q2;
         if (ch == '.')
-            return q2;
+            return q4;
         return dead;
 
     case q3:
+        return dead;
+
+    case q4:
+        if (isdigit(ch))
+            return q5;
+        return dead;
+
+    case q5:
+        if (isdigit(ch))
+            return q5;
         return dead;
 
     default:
@@ -65,23 +77,33 @@ int main()
     ifstream file("input9.txt");
     string token;
 
+    if (!file)
+    {
+        cout << "Error opening file!" << endl;
+        return 1;
+    }
+
     cout << endl;
+
     while (getline(file, token))
     {
         if (token.empty())
             continue;
 
-        // check double operator
+        // Check double operator
         if (token.length() == 2 && doubleOps.count(token))
         {
-            cout << "\"" << token << "\" --> Operator (Double)" << endl;
+            cout << "\"" << token
+                 << "\" --> Operator (Double)" << endl;
             continue;
         }
 
         State current = q0;
+
         for (int i = 0; i < token.length(); i++)
         {
             current = transition(current, token[i]);
+
             if (current == dead)
                 break;
         }
@@ -95,12 +117,18 @@ int main()
             else
                 cout << "Identifier" << endl;
         }
-        else if (current == q2)
+        else if (current == q2 || current == q5)
+        {
             cout << "Constant" << endl;
+        }
         else if (current == q3)
+        {
             cout << "Operator (Single)" << endl;
+        }
         else
+        {
             cout << "Invalid Token" << endl;
+        }
     }
 
     file.close();

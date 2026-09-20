@@ -1,6 +1,9 @@
-myVar
-int
+_myVar
+count
 42
+3.14
 +
+++
 &&
+>=
 @
