@@ -2,7 +2,7 @@
 
 C++ implementations of the experiments from my **Compiler Design Laboratory** course. The programs cover the front-end of a compiler — lexical analysis (character/word counting, comment detection, identifier validation, operator recognition, NFA/DFA-based tokenizing) and parsing preliminaries (left factoring, left-recursion elimination, and FIRST/FOLLOW set computation).
 
-All programs are written in standard C++ and compiled with `g++`. Programs that process source text read from a per-experiment `inputN.txt` file in the working directory; the two grammar-transformation programs (11 and 14) read the grammar interactively from standard input.
+All programs are written in standard C++ and compiled with `g++`. Programs that process source text read from a per-experiment `inputN.txt` file in the working directory. Experiments 11 and 14 read `input11.txt` and `input14.txt`; experiment 15 reads a grammar file plus an interactive target string.
 
 ## Experiments
 
@@ -18,10 +18,11 @@ All programs are written in standard C++ and compiled with `g++`. Programs that 
 | 8  | NFA that recognizes identifiers | [8_NFA.cpp](8_NFA.cpp) | `input8.txt` |
 | 9  | DFA that recognizes identifiers, constants, and operators | [9_DFA.cpp](9_DFA.cpp) | `input9.txt` |
 | 10 | Lexical analyzer that ignores spaces, tabs, newlines, and comments | [10_ignore_space_tab.cpp](10_ignore_space_tab.cpp) | `input10.txt` |
-| 11 | Left factoring of a grammar | [11_left_factoring.cpp](11_left_factoring.cpp) | interactive (stdin) |
+| 11 | Left factoring of a grammar | [11_left_factoring.cpp](11_left_factoring.cpp) | `input11.txt` |
 | 12 | Compute FIRST sets of a grammar | [12_find_FIRST_values.cpp](12_find_FIRST_values.cpp) | `input12.txt` |
 | 13 | Compute FOLLOW sets of a grammar | [13_find_FOLLOW_values.cpp](13_find_FOLLOW_values.cpp) | `input13.txt` |
-| 14 | Eliminate left recursion from a grammar | [14_left_recursion.cpp](14_left_recursion.cpp) | interactive (stdin) |
+| 14 | Eliminate direct left recursion from a grammar | [14_left_recursion.cpp](14_left_recursion.cpp) | `input14.txt` |
+| 15 | Perform leftmost derivation for a target string | [15_leftmost_derivation.cpp](15_leftmost_derivation.cpp) | `input15.txt` + target from stdin |
 
 ## Building and Running
 
@@ -34,18 +35,48 @@ g++ 12_find_FIRST_values.cpp -o 12_find_FIRST_values
 
 For the file-driven programs, make sure the matching `inputN.txt` is present in the current directory (see the table above), then just run the executable — it reads the file and prints the result.
 
-The interactive programs (11 and 14) prompt for the grammar. For example, eliminating left recursion from `E -> E + T | T`:
+Experiment 11 reads one production per line from `input11.txt`. Use single uppercase
+letters for input non-terminals, with all alternatives for a head on one line.
+Spaces and tabs are ignored. Use `e` alone for epsilon (`eS` still contains the
+terminal `e`). Alternatives sharing a prefix are grouped and factored; unrelated
+alternatives remain. New rules are factored again when needed.
+
+Example input:
 
 ```
-Enter number of alternatives: 2
-Enter production head: E
-Enter 2 alternatives:
-Alternative 1: E+T
-Alternative 2: T
+S -> iEtS | iEtSeS | a
+E-> b
+```
 
-Left Recursion Removal Result:
-E --> TE'
-E' --> +TE' | e
+Output (`e` alone means epsilon):
+
+```
+S -> iEtSS' | a
+S' -> e | eS
+E -> b
+```
+
+Experiment 14 reads one production per line
+from `input14.txt`, with `|` separating alternatives and `e` representing epsilon.
+Spaces and tabs are ignored. For this introductory implementation, input
+non-terminals are single uppercase letters without apostrophes. Put all
+alternatives for each head on one line. It removes direct
+left recursion; indirect recursion through other non-terminals is not eliminated.
+For example:
+
+```
+A -> Aabb | BC
+B-> Bca | C
+```
+
+Output:
+
+```
+Direct Left Recursion Removal Result:
+A -> BCA'
+A' -> abbA' | e
+B -> CB'
+B' -> caB' | e
 ```
 
 ### Grammar format (programs 12 & 13)
@@ -61,6 +92,16 @@ F  -> ( E ) | id
 ```
 
 ## Repository Structure
+
+Experiment 15 reads productions from `input15.txt` in the same space-separated
+format as experiments 12 and 13. The first production head is the start symbol;
+symbols appearing as production heads are non-terminals. Enter a target such as
+`id + id * id` at the prompt, or `e` for the empty string. The program prints a
+derivation that replaces the leftmost non-terminal at every step. A recursive
+function tries each alternative and backtracks when a choice fails. Simple
+vectors store the production heads, rules, and derivation steps. It searches
+up to 10,000 expansions and 100 production steps along a path; if either limit prevents
+a conclusion, it reports that the search was inconclusive.
 
 ```
 ├── 2_count_char_word_line.cpp   … 14_left_recursion.cpp   # experiment sources

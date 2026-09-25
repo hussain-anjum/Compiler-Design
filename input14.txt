@@ -1,0 +1,2 @@
+A -> Aabb | BC
+B-> Bca | C

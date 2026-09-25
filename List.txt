@@ -25,3 +25,5 @@
 13. Write a program to find FOLLOW values from a given set of production.✅
 
 14. Write a program to eliminating left recursion for a given grammar.✅
+
+15. Write a program to perform leftmost derivation for a given set of productions.✅
