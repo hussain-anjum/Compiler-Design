@@ -3,13 +3,13 @@ using namespace std;
 
 enum State
 {
-    q0,
-    q1,
-    q2,
-    q3,
-    q4,
-    q5,
-    dead
+    q0,  // Start state.
+    q1,  // Identifier or keyword.
+    q2,  // Integer, such as 42.
+    q3,  // Single-character operator.
+    q4,  // Decimal point read; a digit must come next.
+    q5,  // Decimal number, such as 3.14.
+    dead // Invalid token.
 };
 
 set<char> singleOps = {
@@ -29,11 +29,13 @@ set<string> keywords = {
     "break", "continue", "return", "class", "struct",
     "true", "false", "const", "static", "using", "namespace"};
 
+// A DFA has exactly one next state for each state and input character.
 State transition(State current, char ch)
 {
     switch (current)
     {
     case q0:
+        // The first character decides which type of token to check.
         if (isalpha(ch) || ch == '_')
             return q1;
         if (isdigit(ch))
@@ -43,11 +45,13 @@ State transition(State current, char ch)
         return dead;
 
     case q1:
+        // Identifiers may contain letters, digits and underscores.
         if (isalpha(ch) || isdigit(ch) || ch == '_')
             return q1;
         return dead;
 
     case q2:
+        // More digits keep the number an integer; a dot starts a decimal.
         if (isdigit(ch))
             return q2;
         if (ch == '.')
@@ -55,9 +59,11 @@ State transition(State current, char ch)
         return dead;
 
     case q3:
+        // Double operators are checked separately in main().
         return dead;
 
     case q4:
+        // A decimal point alone is not enough: require a digit after it.
         if (isdigit(ch))
             return q5;
         return dead;
@@ -90,7 +96,7 @@ int main()
         if (token.empty())
             continue;
 
-        // Check double operator
+        // Recognize a listed double operator before running the DFA.
         if (token.length() == 2 && doubleOps.count(token))
         {
             cout << "\"" << token
@@ -100,7 +106,8 @@ int main()
 
         State current = q0;
 
-        for (int i = 0; i < token.length(); i++)
+        // Read the token one character at a time.
+        for (int i = 0; i < (int)token.length(); i++)
         {
             current = transition(current, token[i]);
 
@@ -110,6 +117,7 @@ int main()
 
         cout << "\"" << token << "\" --> ";
 
+        // Classify the token using its final state.
         if (current == q1)
         {
             if (keywords.count(token))
