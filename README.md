@@ -81,7 +81,13 @@ B' -> caB' | e
 
 ### Grammar format (programs 12 & 13)
 
-The FIRST/FOLLOW programs read productions from a text file, one head per line, using `->` for the arrow, `|` to separate alternatives, and `e` for ε. Symbols are space-separated, and a symbol starting with an uppercase letter is treated as a non-terminal:
+The FIRST/FOLLOW programs read productions from a text file, using `->` for the arrow, `|` to separate alternatives, and `e` alone for ε. Symbols are space-separated. Any symbol appearing as a production head is a non-terminal; other symbols are terminals. The first head is the start symbol. Repeated heads are allowed.
+
+Both programs use vectors and ordinary loops. FIRST sets are updated until no
+new symbol can be added, so recursive grammar cycles do not cause infinite
+function calls. Experiment 13 then applies the three FOLLOW rules until its sets
+stop changing. A small `addSymbol` function prevents duplicates. Set members are
+printed in discovery order; their order does not affect the result.
 
 ```
 E  -> T E'

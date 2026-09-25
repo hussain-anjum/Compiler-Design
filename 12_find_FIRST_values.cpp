@@ -1,131 +1,171 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-map<string, vector<vector<string>>> productions;
-vector<string> order;
+vector<string> nonTerminals;
+vector<string> heads;
+vector<vector<string>> rules;
+vector<vector<string>> first;
 
-bool isNonTerminal(string s)
+// Return the position of a non-terminal, or -1 for a terminal.
+int findNonTerminal(string symbol)
 {
-    return !s.empty() && s[0] >= 'A' && s[0] <= 'Z';
+    for (int i = 0; i < (int)nonTerminals.size(); i++)
+        if (nonTerminals[i] == symbol)
+            return i;
+    return -1;
 }
 
-set<string> computeFirst(string X)
+bool contains(vector<string> values, string symbol)
 {
-    set<string> result;
-
-    if (!isNonTerminal(X))
-    {
-        result.insert(X);
-        return result;
-    }
-
-    for (vector<string> rule : productions[X])
-    {
-        if (rule.size() == 1 && rule[0] == "e")
-        {
-            result.insert("e");
-            continue;
-        }
-
-        bool allDeriveEpsilon = true;
-        for (string Y : rule)
-        {
-            set<string> firstY = computeFirst(Y);
-
-            for (string sym : firstY)
-                if (sym != "e")
-                    result.insert(sym);
-
-            if (firstY.find("e") == firstY.end())
-            {
-                allDeriveEpsilon = false;
-                break;
-            }
-        }
-
-        if (allDeriveEpsilon)
-            result.insert("e");
-    }
-
-    return result;
+    for (int i = 0; i < (int)values.size(); i++)
+        if (values[i] == symbol)
+            return true;
+    return false;
 }
-vector<string> tokenize(string s)
+
+// & lets this function update the original vector.
+// Return true only when a NEW symbol is added.
+bool addSymbol(vector<string>& values, string symbol)
 {
-    vector<string> tokens;
-    stringstream ss(s);
+    if (contains(values, symbol))
+        return false;
+    values.push_back(symbol);
+    return true;
+}
+
+vector<string> split(string text)
+{
+    vector<string> words;
+    stringstream ss(text);
     string word;
     while (ss >> word)
-        tokens.push_back(word);
-    return tokens;
+        words.push_back(word);
+    return words;
 }
 
-int main()
+bool readGrammar(string filename)
 {
-    ifstream file("input12.txt");
-    string line;
+    ifstream file(filename);
+    if (!file)
+    {
+        cout << "Error opening " << filename << endl;
+        return false;
+    }
 
+    string line;
     while (getline(file, line))
     {
-        if (line.empty())
+        if (split(line).empty())
             continue;
-
-        // find arrow
-        size_t pos = line.find("->");
-        if (pos == string::npos)
-            continue;
-
-        string lhs = line.substr(0, pos);
-        string rhs = line.substr(pos + 2);
-
-        // head = first token of lhs
-        vector<string> headTokens = tokenize(lhs);
-        if (headTokens.empty())
-            continue;
-        string head = headTokens[0];
-
-        // split rhs by |
-        vector<string> alts;
-        string cur = "";
-        for (int i = 0; i < rhs.length(); i++)
+        size_t arrow = line.find("->");
+        if (arrow == string::npos)
         {
-            if (rhs[i] == '|')
-            {
-                alts.push_back(cur);
-                cur = "";
-            }
+            cout << "Missing -> in: " << line << endl;
+            return false;
+        }
+        vector<string> head = split(line.substr(0, arrow));
+        if (head.size() != 1 || head[0] == "e")
+        {
+            cout << "Use one non-terminal before ->." << endl;
+            return false;
+        }
+        addSymbol(nonTerminals, head[0]);
+
+        string rhs = line.substr(arrow + 2) + "|";
+        string alternative = "";
+        for (int i = 0; i < (int)rhs.length(); i++)
+        {
+            if (rhs[i] != '|')
+                alternative += rhs[i];
             else
-                cur += rhs[i];
+            {
+                vector<string> rule = split(alternative);
+                if (rule.empty() || (rule.size() > 1 && contains(rule, "e")))
+                {
+                    cout << "Use e alone for an empty alternative." << endl;
+                    return false;
+                }
+                heads.push_back(head[0]);
+                rules.push_back(rule);
+                alternative = "";
+            }
         }
-        alts.push_back(cur);
-
-        for (string a : alts)
-        {
-            vector<string> symbols = tokenize(a);
-            if (!symbols.empty())
-                productions[head].push_back(symbols);
-        }
-
-        if (find(order.begin(), order.end(), head) == order.end())
-            order.push_back(head);
     }
-    file.close();
-
-    // cout << "\n===== FIRST Sets =====" << endl;
-    for (string nt : order)
+    if (nonTerminals.empty())
     {
-        set<string> f = computeFirst(nt);
-
-        cout << "FIRST(" << nt << ") = { ";
-        bool first = true;
-        for (string sym : f)
-        {
-            if (!first)
-                cout << ", ";
-            cout << sym;
-            first = false;
-        }
-        cout << " }" << endl;
+        cout << "No productions found." << endl;
+        return false;
     }
+    first.resize(nonTerminals.size());
+    return true;
+}
 
+void computeFirst()
+{
+    bool changed = true;
+    while (changed)
+    {
+        changed = false;
+        for (int i = 0; i < (int)rules.size(); i++)
+        {
+            int a = findNonTerminal(heads[i]);
+            bool allNullable = true;
+
+            // Scan the right side from left to right.
+            for (int j = 0; j < (int)rules[i].size(); j++)
+            {
+                string symbol = rules[i][j];
+                if (symbol == "e")
+                    continue;
+
+                int b = findNonTerminal(symbol);
+                if (b == -1)
+                {
+                    // A terminal goes directly into FIRST(A).
+                    if (addSymbol(first[a], symbol))
+                        changed = true;
+                    allNullable = false;
+                    break;
+                }
+
+                // Copy FIRST(B), except epsilon, into FIRST(A).
+                for (int k = 0; k < (int)first[b].size(); k++)
+                {
+                    if (first[b][k] != "e")
+                        if (addSymbol(first[a], first[b][k]))
+                            changed = true;
+                }
+                if (!contains(first[b], "e"))
+                {
+                    allNullable = false;
+                    break;
+                }
+            }
+            if (allNullable)
+                if (addSymbol(first[a], "e"))
+                    changed = true;
+        }
+    }
+}
+
+void printSet(string label, string head, vector<string> values)
+{
+    cout << label << "(" << head << ") = { ";
+    for (int i = 0; i < (int)values.size(); i++)
+    {
+        if (i != 0)
+            cout << ", ";
+        cout << values[i];
+    }
+    cout << " }" << endl;
+}
+int main()
+{
+    if (!readGrammar("input12.txt"))
+        return 1;
+
+    computeFirst();
+    for (int i = 0; i < (int)nonTerminals.size(); i++)
+        printSet("FIRST", nonTerminals[i], first[i]);
     return 0;
 }
